@@ -1,0 +1,40 @@
+CC = gcc
+AR = ar
+RM = rm
+
+TARGET_DIR  = ./
+TARGET_LIB = lua
+
+SRCS    = $(wildcard source/*.c)
+CFLAGS  = -fno-common -fno-exceptions
+
+#===============================================================#
+
+CXFLAGS		= -Wall -O3 -DNDEBUG
+TARGET_NAME = lib$(TARGET_LIB).a
+OBJDIR      = build
+
+
+OBJS		= $(patsubst %, $(OBJDIR)/%.o, $(basename $(SRCS)))
+OBJS2       = $(patsubst %, $(OBJDIR)/%.o, $(basename $(notdir $(SRCS))))
+
+CXXFLAGS	= $(INCDIRS) -I./source $(CXFLAGS) $(CFLAGS)
+
+TARGET      = $(TARGET_DIR)$(TARGET_NAME)
+
+all: $(TARGET)
+
+$(TARGET): $(TARGET_DIR) $(OBJDIR) $(OBJS)
+	$(AR) -r $(TARGET) $(OBJS2)
+
+$(OBJS): $(OBJDIR)/%.o: %.c
+	$(CC) $(CXXFLAGS) -c $< -o $(OBJDIR)/$(notdir $@)
+
+$(OBJDIR):
+	mkdir -p $@
+
+$(TARGET_DIR):
+	mkdir -p $@
+
+clean:
+	rm -rf $(TARGET) $(OBJDIR) $(OBJS)
